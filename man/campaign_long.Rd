@@ -4,7 +4,8 @@
 \name{campaign_long}
 \alias{campaign_long}
 \title{Long-format Data on Negative Campaign Advertising in US Senate and Gubernatorial Elections}
-\format{A data frame with 565 rows and 17 columns: \describe{
+\format{
+A data frame with 565 rows and 19 columns: \describe{
   \item{demName}{name of the Democratic candidate}
   \item{d.gone.neg}{whether the candidate went negative in a campaign-week,
    defined as whether more than 10\% of the candidate's political advertising was negative}
@@ -22,13 +23,16 @@
   \item{dem.polls.l1}{Democratic share in the polls in the previous campaign-week}
   \item{undother}{share of undecided voters in the polls}
   \item{undother.l1}{share of undecided voters in the polls in the previous campaign-week}
+  \item{neg.dem}{the proportion of advertisements that were negative in a campaign-week}
+  \item{neg.dem.l1}{the proportion of advertisements that were negative in the previous campaign-week}
   \item{id}{candidate id}
- }}
+ }
+}
 \usage{
 campaign_long
 }
 \description{
-A dataset containing 17 variables and 565 unit-week records on the campaign of 113 Democratic candidates
+A dataset containing 19 variables and 565 unit-week records on the campaign of 113 Democratic candidates
 in US Senate and Gubernatorial Elections from 2000 to 2006 (Blackwell 2013).
 }
 \references{

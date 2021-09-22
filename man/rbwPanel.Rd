@@ -5,30 +5,35 @@
 \title{Residual Balancing Weights for Analyzing Time-varying Treatments}
 \usage{
 rbwPanel(
-  exposure,
+  treatment,
   xmodels,
   id,
   time,
   data,
   base_weights,
+  future = 1L,
   max_iter = 200,
   print_level = 1,
-  tol = 1e-04
+  tol = 1e-06
 )
 }
 \arguments{
-\item{exposure}{A symbol or character string for the exposure/treatment variable.}
+\item{treatment}{A symbol or character string for the treatment/treatment variable.}
 
 \item{xmodels}{A list of fitted \code{lm} or \code{glm} objects for
 time-varying confounders.}
 
 \item{id}{A symbol or character string for the unit id variable.}
 
-\item{time}{A symbol or character string for the time variable.}
+\item{time}{A symbol or character string for the time variable. The time variable should be numeric.}
 
 \item{data}{A data frame containing all variables in the model.}
 
 \item{base_weights}{(Optional) A vector of base weights (or its name).}
+
+\item{future}{An integer indicating the number of future treatments in the balancing conditions. When
+\code{future > 0}, the residualized time-varying covariates are balanced not only with respect to
+current treatment \eqn{D_t}, but also with respect to future treatments \eqn{D_{t+1},\ldots D_{t + future}}.}
 
 \item{max_iter}{Maximum number of iterations for Newton's method.}
 
@@ -53,9 +58,10 @@ A list containing the results.
 \code{rbwPanel} is a function that produces residual balancing weights (rbw) for
 estimating the marginal effects of time-varying treatments. The user supplies
 a long format data frame (each row being a unit-period) and a list of
-fitted model objects for time-varying confounders. In the current implementation,
-the residuals of a time-varying covariate \eqn{X_t} are balanced across both current
-treatment \eqn{D_t} and the regressors of \eqn{X_t}.
+fitted model objects for time-varying confounders. The residuals of each time-varying
+covariate \eqn{X_t} are balanced across both current treatment \eqn{D_t} and
+the regressors of \eqn{X_t}. In addition, when \code{future > 0},
+the residuals are also balanced across future treatments \eqn{D_{t+1},\ldots D_{t + future}}.
 }
 \examples{
 # models for time-varying confounders
@@ -67,7 +73,7 @@ data = campaign_long)
 xmodels <- list(m1, m2)
 
 # residual balancing weights
-rbwPanel_fit <- rbwPanel(exposure = d.gone.neg, xmodels = xmodels, id = id,
+rbwPanel_fit <- rbwPanel(treatment = d.gone.neg, xmodels = xmodels, id = id,
 time = week, data = campaign_long)
 
 summary(rbwPanel_fit$weights)
@@ -78,8 +84,8 @@ campaign_wide2 <- merge(campaign_wide, rbwPanel_fit$weights, by = "id")
 # fit a marginal structural model (adjusting for baseline confounders)
 if(require(survey)){
   rbw_design <- svydesign(ids = ~ 1, weights = ~ rbw, data = campaign_wide2)
-  msm_rbw <- svyglm(demprcnt ~ cum_neg * deminc + camp.length + factor(year) + office,
+  msm_rbwPanel <- svyglm(demprcnt ~ cum_neg * deminc + camp.length + factor(year) + office,
   design = rbw_design)
-  summary(msm_rbw)
+  summary(msm_rbwPanel)
 }
 }
